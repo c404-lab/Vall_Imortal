@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Deteksi NIK KTP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 550px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+        }
+        .result-box {
+            margin-top: 20px;
+            background: #eef2f7;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 5px solid #007bff;
+        }
+        .result-box h3 {
+            margin-top: 0;
+            color: #007bff;
+            font-size: 16px;
+        }
+        ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        li {
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .error {
+            color: #d9534f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Auto Deteksi NIK KTP</h2>
+    <div class="form-group">
+        <label for="nikInput">Masukkan 16 Digit NIK:</label>
+        <input type="text" id="nikInput" maxlength="16" placeholder="Contoh: 1702... atau 3313..." oninput="deteksiNik()">
+    </div>
+
+    <div class="result-box" id="resultContainer">
+        <h3>Hasil Deteksi:</h3>
+        <p id="outputText">Silakan ketik 16 digit NIK pada kolom di atas.</p>
+    </div>
+</div>
+
+<script>
+    // Kamus Kode Provinsi Indonesia
+    const daftarProvinsi = {
+        "11": "Aceh", "12": "Sumatera Utara", "13": "Sumatera Barat", 
+        "14": "Riau", "15": "Jambi", "16": "Sumatera Selatan", 
+        "17": "Bengkulu", "18": "Lampung", "19": "Kepulauan Bangka Belitung", 
+        "21": "Kepulauan Riau", "31": "DKI Jakarta", "32": "Jawa Barat", 
+        "33": "Jawa Tengah", "34": "DI Yogyakarta", "35": "Jawa Timur", 
+        "36": "Banten", "51": "Bali", "52": "Nusa Tenggara Barat (NTB)", 
+        "53": "Nusa Tenggara Timur (NTT)", "61": "Kalimantan Barat", 
+        "62": "Kalimantan Tengah", "63": "Kalimantan Selatan", 
+        "64": "Kalimantan Timur", "65": "Kalimantan Utara", 
+        "71": "Sulawesi Utara", "72": "Sulawesi Tengah", "73": "Sulawesi Selatan", 
+        "74": "Sulawesi Tenggara", "75": "Gorontalo", "76": "Sulawesi Barat", 
+        "81": "Maluku", "82": "Maluku Utara", "91": "Papua", 
+        "92": "Papua Barat", "93": "Papua Selatan", "94": "Papua Tengah", "95": "Papua Pegunungan"
+    };
+
+    const namaBulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+    function deteksiNik() {
+        const nik = document.getElementById('nikInput').value.trim();
+        const output = document.getElementById('outputText');
+
+        if (nik.length === 0) {
+            output.innerHTML = "Silakan ketik 16 digit NIK pada kolom di atas.";
+            return;
+        }
+
+        if (nik.length !== 16) {
+            output.innerHTML = `<span class="error">NIK harus tepat 16 digit! (Saat ini: ${nik.length} digit)</span>`;
+            return;
+        }
+
+        if (!/^\d+$/.test(nik)) {
+            output.innerHTML = `<span class="error">NIK hanya boleh berisi angka!</span>`;
+            return;
+        }
+
+        // Ambil bagian-bagian NIK
+        const kodeProv = nik.substring(0, 2);
+        const kodeKabKota = nik.substring(2, 4);
+        const kodeKec = nik.substring(4, 6);
+        
+        let tglStr = nik.substring(6, 8);
+        const blnStr = nik.substring(8, 10);
+        const thnStr = nik.substring(10, 12);
+        const noUrut = nik.substring(12, 16);
+
+        // Deteksi Provinsi
+        const namaProvinsi = daftarProvinsi[kodeProv] || "Provinsi Tidak Dikenal";
+
+        // Deteksi Jenis Kelamin & Tanggal Lahir
+        let tglInt = parseInt(tglStr, 10);
+        let jenisKelamin = "Laki-laki";
+        
+        if (tglInt > 40) {
+            jenisKelamin = "Perempuan";
+            tglInt -= 40; // Kembalikan ke tanggal asli
+        }
+
+        // Format tanggal rapi (misal: 05 jadi 5)
+        let tanggalLahir = tglInt;
+
+        // Deteksi Bulan
+        const bulanIndex = parseInt(blnStr, 10);
+        const namaBulanLahir = (bulanIndex >= 1 && bulanIndex <= 12) ? namaBulan[bulanIndex] : "Bulan Tidak Valid";
+
+        // Asumsi tahun (jika tahun 00-25 masuk 2000an, sisanya 1900an)
+        let tahunLahirInt = parseInt(thnStr, 10);
+        let tahunLengkap = (tahunLahirInt <= 26) ? "20" + thnStr : "19" + thnStr;
+
+        // Tampilkan Hasil Otomatis
+        output.innerHTML = `
+            <ul>
+                <li><strong>Provinsi:</strong> ${namaProvinsi} (Kode: ${kodeProv})</li>
+                <li><strong>Kab/Kota & Kecamatan:</strong> Kode ${kodeKabKota} - ${kodeKec}</li>
+                <li><strong>Jenis Kelamin:</strong> ${jenisKelamin}</li>
+                <li><strong>Tanggal Lahir:</strong> ${tanggalLahir} ${namaBulanLahir} ${tahunLengkap}</li>
+                <li><strong>Nomor Urut Registrasi:</strong> ${noUrut}</li>
+            </ul>
+        `;
+    }
+</script>
+
+</body>
+</html>
